@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"fmt"
@@ -12,20 +11,20 @@ import (
 	todo "github.com/LineCoran/go-api/pkg"
 	_ "github.com/lib/pq"
 	"github.com/lpernett/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func main() {
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfig(); err != nil {
-		log.Fatalln("Ошибка чтения файла конфигурации", err.Error())
+		logrus.Fatalln("Ошибка чтения файла конфигурации", err.Error())
 	}
 
 	if err := initEnv(); err != nil {
-		log.Fatalln("Ошибка загрузки .env файла", err.Error())
+		logrus.Fatalln("Ошибка загрузки .env файла", err.Error())
 	}
-
-	// dbpassword := os.Getenv("DB_PASSWORD")
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Username: viper.GetString("db_username"),
@@ -36,11 +35,10 @@ func main() {
 		SSLMode:  viper.GetString("db_sslmode"),
 	})
 	if err != nil {
-		log.Fatalln("Ошибка создания БД", err.Error())
+		logrus.Fatalln("Ошибка создания БД", err.Error())
 	}
-	fmt.Println(db)
 	port := viper.GetString("port")
-	repos := repository.NewRepository()
+	repos := repository.NewRepository(db)
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
 
@@ -48,7 +46,7 @@ func main() {
 
 	fmt.Println("Сервер запущен на порте: ", port)
 	if err := server.Run(port, handlers.InitRoutes()); err != nil {
-		log.Fatalln("Ошибка сервера", err.Error())
+		logrus.Fatalln("Ошибка сервера", err.Error())
 	}
 
 }

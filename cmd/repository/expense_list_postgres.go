@@ -1,0 +1,28 @@
+package repository
+
+import (
+	"fmt"
+
+	todo "github.com/LineCoran/go-api"
+	"github.com/jmoiron/sqlx"
+)
+
+type ExpenseListPostgres struct {
+	db *sqlx.DB
+}
+
+func NewExpenseListPostgres(db *sqlx.DB) *ExpenseListPostgres {
+	return &ExpenseListPostgres{db: db}
+}
+
+func (r *ExpenseListPostgres) Create(userId int, expense todo.Expense) (int, error) {
+	var id int
+	// TODO Вынести название таблицы в константу
+	createExpenseQuery := fmt.Sprintf("INSERT INTO expense (chat_id, category_id, amount, description) values ($1, $2, $3, $4) RETURNING id")
+	row := r.db.QueryRow(createExpenseQuery, expense.ID, expense.CategoryId, expense.Amount, expense.Description)
+	if err := row.Scan(&id); err != nil {
+		fmt.Printf("Error scanning id: %v\n", err)
+		return 0, err
+	}
+	return id, nil
+}

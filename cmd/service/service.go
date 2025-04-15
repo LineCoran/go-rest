@@ -1,6 +1,9 @@
 package service
 
-import "github.com/LineCoran/go-api/cmd/repository"
+import (
+	todo "github.com/LineCoran/go-api"
+	"github.com/LineCoran/go-api/cmd/repository"
+)
 
 type Authorization interface {
 }
@@ -9,6 +12,7 @@ type ExpenseItem interface {
 }
 
 type ExpenseList interface {
+	Create(userId int, expese todo.Expense) (int, error)
 }
 
 type Service struct {
@@ -18,5 +22,5 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{ExpenseList: NewExpenseListService(repos.ExpenseList)}
 }

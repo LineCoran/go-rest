@@ -1,9 +1,19 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	todo "github.com/LineCoran/go-api"
+	"github.com/gin-gonic/gin"
+)
 
 func (h *Handler) createExpense(c *gin.Context) {
-
+	var input todo.Expense
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	h.services.Create(123, input)
 }
 
 func (h *Handler) getAllExpense(c *gin.Context) {
