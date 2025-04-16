@@ -14,6 +14,7 @@ type ExpenseItem interface {
 type ExpenseList interface {
 	Create(userId int, expese todo.Expense) (int, error)
 	Delete(id string) (string, error)
+	GetById(id int) (todo.Expense, error)
 }
 
 type Service struct {

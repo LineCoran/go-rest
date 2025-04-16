@@ -30,7 +30,7 @@ func (h Handler) InitRoutes() *gin.Engine {
 		{
 			expenses.POST("/", h.createExpense)
 			expenses.GET("/", h.getAllExpense)
-			expenses.GET("/:id", h.deleteExpenseById)
+			expenses.GET("/:id", h.getExpenseById)
 			expenses.DELETE("/:id", h.deleteExpenseById)
 			expenses.PUT("/:id", h.updateExpenseById)
 		}

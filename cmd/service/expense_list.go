@@ -20,3 +20,7 @@ func (s *ExpenseListService) Create(userId int, expense todo.Expense) (int, erro
 func (s *ExpenseListService) Delete(id string) (string, error) {
 	return s.repo.Delete(id)
 }
+
+func (s *ExpenseListService) GetById(id int) (todo.Expense, error) {
+	return s.repo.GetById(id)
+}

@@ -36,3 +36,13 @@ func (r *ExpenseListPostgres) Delete(id string) (string, error) {
 	}
 	return id, nil
 }
+
+func (r *ExpenseListPostgres) GetById(id int) (todo.Expense, error) {
+	var expense todo.Expense
+	query := fmt.Sprintf("SELECT id, category_id, amount, description FROM expense WHERE id = $1")
+	err := r.db.Get(&expense, query, id)
+	if err != nil {
+		return todo.Expense{}, fmt.Errorf("failed to get expense by id: %w", err)
+	}
+	return expense, nil
+}
