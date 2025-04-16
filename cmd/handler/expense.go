@@ -25,7 +25,8 @@ func (h *Handler) getExpenseById(c *gin.Context) {
 }
 
 func (h *Handler) deleteExpenseById(c *gin.Context) {
-
+	id := c.Param("id")
+	h.services.Delete(id)
 }
 
 func (h *Handler) updateExpenseById(c *gin.Context) {

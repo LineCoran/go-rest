@@ -26,3 +26,13 @@ func (r *ExpenseListPostgres) Create(userId int, expense todo.Expense) (int, err
 	}
 	return id, nil
 }
+
+func (r *ExpenseListPostgres) Delete(id string) (string, error) {
+	deleteExpenseQuery := fmt.Sprintf("DELETE from expense WHERE id = $1")
+	row := r.db.QueryRow(deleteExpenseQuery, id)
+	if err := row.Scan(&id); err != nil {
+		fmt.Printf("Error scanning id: %v\n", err)
+		return "error", err
+	}
+	return id, nil
+}

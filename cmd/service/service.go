@@ -13,6 +13,7 @@ type ExpenseItem interface {
 
 type ExpenseList interface {
 	Create(userId int, expese todo.Expense) (int, error)
+	Delete(id string) (string, error)
 }
 
 type Service struct {
