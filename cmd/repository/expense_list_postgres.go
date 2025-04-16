@@ -29,11 +29,21 @@ func (r *ExpenseListPostgres) Create(userId int, expense todo.Expense) (int, err
 
 func (r *ExpenseListPostgres) Delete(id string) (string, error) {
 	deleteExpenseQuery := fmt.Sprintf("DELETE from expense WHERE id = $1")
-	row := r.db.QueryRow(deleteExpenseQuery, id)
-	if err := row.Scan(&id); err != nil {
-		fmt.Printf("Error scanning id: %v\n", err)
+	result, err := r.db.Exec(deleteExpenseQuery, id)
+	if err != nil {
+		fmt.Printf("Error deleting expense: %v\n", err)
 		return "error", err
 	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return "error", err
+	}
+
+	if rowsAffected == 0 {
+		return "error", fmt.Errorf("no rows affected - record with id %s not found", id)
+	}
+
 	return id, nil
 }
 
@@ -42,7 +52,6 @@ func (r *ExpenseListPostgres) GetById(id int) (todo.Expense, error) {
 	query := fmt.Sprintf("SELECT id, category_id, amount, description FROM expense WHERE id = $1")
 	err := r.db.Get(&expense, query, id)
 	if err != nil {
-
 		return todo.Expense{}, fmt.Errorf("failed to get expense by id: %w", err)
 	}
 	return expense, nil
