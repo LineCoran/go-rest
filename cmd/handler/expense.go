@@ -11,7 +11,7 @@ import (
 func (h *Handler) createExpense(c *gin.Context) {
 	var input todo.Expense
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	h.services.Create(123, input)
@@ -43,7 +43,15 @@ func (h *Handler) getExpenseById(c *gin.Context) {
 
 func (h *Handler) deleteExpenseById(c *gin.Context) {
 	id := c.Param("id")
-	h.services.Delete(id)
+	deletedId, err := h.services.Delete(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to delete expense: " + err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, deletedId)
 }
 
 func (h *Handler) updateExpenseById(c *gin.Context) {
