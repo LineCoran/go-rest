@@ -3,12 +3,18 @@ package service
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
 
 	todo "github.com/LineCoran/go-api"
 	"github.com/LineCoran/go-api/cmd/repository"
+	"github.com/dgrijalva/jwt-go"
 )
 
-const salt = "'asdfaeweasdf"
+const (
+	salt       = "secret"
+	signingKey = "secret"
+	tokenTTL   = 12 * time.Hour
+)
 
 type AuthService struct {
 	repo repository.Authorization
@@ -20,7 +26,6 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
 	hashed := generateHashedPassword(user.Password)
-	fmt.Println(hashed)
 	user.Password = hashed
 	id, err := s.repo.SignUp(user)
 	if err != nil {
@@ -28,6 +33,28 @@ func (s *AuthService) CreateUser(user todo.User) (int, error) {
 	}
 
 	return id, nil
+}
+
+type tokensClaims struct {
+	jwt.StandardClaims
+	UserID int `json:"id"`
+}
+
+func (s *AuthService) GenerateToken(username string, password string) (string, error) {
+	hashed := generateHashedPassword(password)
+	id, err := s.repo.GetUser(username, hashed)
+	if err != nil {
+		return "", err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokensClaims{
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		UserID: id,
+	})
+	return token.SignedString([]byte(signingKey))
 }
 
 func generateHashedPassword(password string) string {

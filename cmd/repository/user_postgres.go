@@ -25,3 +25,16 @@ func (r *UserRepository) SignUp(user todo.User) (int, error) {
 	}
 	return id, nil
 }
+
+func (r *UserRepository) GetUser(username string, password string) (int, error) {
+	var id int
+	createExpenseQuery := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", usersTable)
+	row := r.db.QueryRow(createExpenseQuery, username, password)
+	fmt.Println(password)
+	fmt.Println(row)
+	if err := row.Scan(&id); err != nil {
+		fmt.Printf("Error scanning id: %v\n", err)
+		return 0, err
+	}
+	return id, nil
+}

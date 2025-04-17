@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	SignUp(user todo.User) (int, error)
+	GetUser(username string, password string) (int, error)
 }
 
 type ExpenseItem interface {
