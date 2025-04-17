@@ -6,6 +6,7 @@ import (
 )
 
 type Authorization interface {
+	CreateUser(user todo.User) (int, error)
 }
 
 type ExpenseItem interface {
@@ -24,5 +25,8 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{ExpenseList: NewExpenseListService(repos.ExpenseList)}
+	return &Service{
+		ExpenseList:   NewExpenseListService(repos.ExpenseList),
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }

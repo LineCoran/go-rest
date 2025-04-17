@@ -11,7 +11,7 @@ import (
 func (h *Handler) createExpense(c *gin.Context) {
 	var input todo.Expense
 	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	h.services.Create(123, input)

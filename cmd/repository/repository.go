@@ -6,6 +6,7 @@ import (
 )
 
 type Authorization interface {
+	SignUp(user todo.User) (int, error)
 }
 
 type ExpenseItem interface {
@@ -24,5 +25,8 @@ type Repository struct {
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
-	return &Repository{ExpenseList: NewExpenseListPostgres(db)}
+	return &Repository{
+		ExpenseList:   NewExpenseListPostgres(db),
+		Authorization: NewAuthRepository(db),
+	}
 }
