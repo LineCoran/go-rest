@@ -17,9 +17,8 @@ func NewExpenseListPostgres(db *sqlx.DB) *ExpenseListPostgres {
 
 func (r *ExpenseListPostgres) Create(userId int, expense todo.Expense) (int, error) {
 	var id int
-	// TODO Вынести название таблицы в константу
-	createExpenseQuery := fmt.Sprintf("INSERT INTO %s (chat_id, category_id, amount, description) values ($1, $2, $3, $4) RETURNING id", expenseTable)
-	row := r.db.QueryRow(createExpenseQuery, expense.ID, expense.CategoryId, expense.Amount, expense.Description)
+	createExpenseQuery := fmt.Sprintf("INSERT INTO %s (user_id, category_id, amount, description) values ($1, $2, $3, $4) RETURNING id", expenseTable)
+	row := r.db.QueryRow(createExpenseQuery, userId, expense.CategoryId, expense.Amount, expense.Description)
 	if err := row.Scan(&id); err != nil {
 		fmt.Printf("Error scanning id: %v\n", err)
 		return 0, err
@@ -55,4 +54,19 @@ func (r *ExpenseListPostgres) GetById(id int) (todo.Expense, error) {
 		return todo.Expense{}, fmt.Errorf("failed to get expense by id: %w", err)
 	}
 	return expense, nil
+}
+
+func (r *ExpenseListPostgres) GetAllByUserId(userId int) ([]todo.Expense, error) {
+	var expenses []todo.Expense
+	query := fmt.Sprintf("SELECT id, category_id, amount, created_at, description FROM %s WHERE user_id = $1", expenseTable)
+	err := r.db.Select(&expenses, query, userId)
+	if err != nil {
+		return []todo.Expense{}, fmt.Errorf("failed to get expense by id: %w", err)
+	}
+
+	if len(expenses) == 0 {
+		return []todo.Expense{}, nil
+	}
+
+	return expenses, nil
 }

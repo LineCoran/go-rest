@@ -17,6 +17,7 @@ type ExpenseList interface {
 	Create(userId int, expense todo.Expense) (int, error)
 	Delete(id string) (string, error)
 	GetById(id int) (todo.Expense, error)
+	GetAllByUserId(id int) ([]todo.Expense, error)
 }
 
 type Repository struct {
