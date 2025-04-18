@@ -19,6 +19,7 @@ type ExpenseList interface {
 	Delete(id string) (string, error)
 	GetById(id int) (todo.Expense, error)
 	GetAllByUserId(id int) ([]todo.Expense, error)
+	Update(expenseId int, expense todo.Expense) (todo.Expense, error)
 }
 
 type Service struct {

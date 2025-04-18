@@ -70,3 +70,28 @@ func (r *ExpenseListPostgres) GetAllByUserId(userId int) ([]todo.Expense, error)
 
 	return expenses, nil
 }
+
+func (r *ExpenseListPostgres) Update(expenseId int, expense todo.Expense) (todo.Expense, error) {
+	query := fmt.Sprintf(`
+        UPDATE %s 
+        SET category_id = $1, 
+            amount = $2, 
+            description = $3 
+        WHERE id = $4
+        RETURNING id, category_id, amount, description, created_at
+    `, expenseTable)
+
+	var updatedExpense todo.Expense
+	err := r.db.QueryRowx(query,
+		expense.CategoryId,
+		expense.Amount,
+		expense.Description,
+		expenseId,
+	).StructScan(&updatedExpense)
+
+	if err != nil {
+		return todo.Expense{}, fmt.Errorf("failed to update expense: %w", err)
+	}
+
+	return updatedExpense, nil
+}

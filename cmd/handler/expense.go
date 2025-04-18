@@ -86,5 +86,28 @@ func (h *Handler) deleteExpenseById(c *gin.Context) {
 }
 
 func (h *Handler) updateExpenseById(c *gin.Context) {
+	expenseIdStr := c.Param("id")
+	var input todo.Expense
 
+	expenseId, err := strconv.Atoi(expenseIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid id format, must be integer",
+		})
+		return
+	}
+
+	if err := c.BindJSON(&input); err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	expense, err := h.services.Update(expenseId, input)
+
+	if err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, expense)
 }

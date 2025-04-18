@@ -28,3 +28,7 @@ func (s *ExpenseListService) GetById(id int) (todo.Expense, error) {
 func (s *ExpenseListService) GetAllByUserId(id int) ([]todo.Expense, error) {
 	return s.repo.GetAllByUserId(id)
 }
+
+func (s *ExpenseListService) Update(expenseId int, expense todo.Expense) (todo.Expense, error) {
+	return s.repo.Update(expenseId, expense)
+}
