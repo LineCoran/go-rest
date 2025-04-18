@@ -11,8 +11,5 @@ type ResponseError struct {
 
 func NewErrorResponse(c *gin.Context, statusCode int, message string) {
 	logrus.Error(message)
-	c.JSON(statusCode, gin.H{
-		"error": message,
-	})
-	// c.AbortWithStatusJSON(statusCode, ResponseError{message})
+	c.AbortWithStatusJSON(statusCode, ResponseError{message})
 }

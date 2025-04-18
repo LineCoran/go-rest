@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"time"
 
@@ -55,6 +56,27 @@ func (s *AuthService) GenerateToken(username string, password string) (string, e
 		UserID: id,
 	})
 	return token.SignedString([]byte(signingKey))
+}
+
+func (s *AuthService) ParseToken(accessToken string) (int, error) {
+	token, err := jwt.ParseWithClaims(accessToken, &tokensClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(signingKey), nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*tokensClaims)
+
+	if !ok {
+		return 0, errors.New("token claims are not type *tokensClaims")
+	}
+
+	return claims.UserID, nil
 }
 
 func generateHashedPassword(password string) string {
