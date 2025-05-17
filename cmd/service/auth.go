@@ -25,6 +25,10 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
+func (s *AuthService) IsExist(username string) (int, error) {
+	return s.repo.IsExist(username)
+}
+
 func (s *AuthService) CreateUser(user todo.User) (int, error) {
 	hashed := generateHashedPassword(user.Password)
 	user.Password = hashed

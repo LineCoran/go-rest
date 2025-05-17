@@ -31,6 +31,10 @@ type InputUserSctructure struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type InputUserNameSctructure struct {
+	Username string `json:"username" binding:"required"`
+}
+
 func (h *Handler) signIn(c *gin.Context) {
 
 	var input InputUserSctructure
@@ -50,4 +54,23 @@ func (h *Handler) signIn(c *gin.Context) {
 		"token": token,
 	})
 
+}
+
+func (h *Handler) checkExistByUserName(c *gin.Context) {
+	var input InputUserNameSctructure
+
+	if err := c.BindJSON(&input); err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	exist, err := h.services.IsExist(input.Username)
+	if err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"id": exist,
+	})
 }
