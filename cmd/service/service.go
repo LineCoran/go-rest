@@ -9,6 +9,7 @@ type Authorization interface {
 	CreateUser(user todo.User) (int, error)
 	GenerateToken(username string, password string) (string, error)
 	ParseToken(token string) (int, error)
+	IsExist(username string) (int, error)
 }
 
 type ExpenseItem interface {

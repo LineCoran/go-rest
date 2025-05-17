@@ -36,3 +36,15 @@ func (r *UserRepository) GetUser(username string, password string) (int, error) 
 	}
 	return id, nil
 }
+
+func (r *UserRepository) IsExist(username string) (int, error) {
+	var id int
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1", usersTable)
+	
+	err := r.db.QueryRow(query, username).Scan(&id)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get user by id: %w", err)
+	}
+	
+	return id, nil
+}
