@@ -21,7 +21,7 @@ func (h *Handler) createExpense(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Create(id.(int), input)
+	id, err := h.services.ExpenseList.Create(id.(int), input)
 	if err != nil {
 		NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -40,7 +40,7 @@ func (h *Handler) getAllExpense(c *gin.Context) {
 		return
 	}
 
-	expenses, err := h.services.GetAllByUserId(userId.(int))
+	expenses, err := h.services.ExpenseList.GetAllByUserId(userId.(int))
 	if err != nil {
 		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -74,7 +74,7 @@ func (h *Handler) getExpenseById(c *gin.Context) {
 
 func (h *Handler) deleteExpenseById(c *gin.Context) {
 	id := c.Param("id")
-	deletedId, err := h.services.Delete(id)
+	deletedId, err := h.services.ExpenseList.Delete(id)
 	if err != nil {
 		NewErrorResponse(c, http.StatusInternalServerError, "failed to delete expense by id")
 		return
@@ -102,7 +102,7 @@ func (h *Handler) updateExpenseById(c *gin.Context) {
 		return
 	}
 
-	expense, err := h.services.Update(expenseId, input)
+	expense, err := h.services.ExpenseList.Update(expenseId, input)
 
 	if err != nil {
 		NewErrorResponse(c, http.StatusInternalServerError, err.Error())

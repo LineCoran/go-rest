@@ -14,6 +14,13 @@ type Authorization interface {
 type ExpenseItem interface {
 }
 
+type CategoryList interface {
+	CreateOne(userId int, category todo.ExpenseCategory) (int, error)
+	GetByName(userId int, name string) (int, error)
+	GetAllByUserId(userId int) ([]todo.ExpenseCategory, error)
+	DeleteCategory(userId int, categoryId int) (int, error)
+}
+
 type ExpenseList interface {
 	Create(userId int, expese todo.Expense) (int, error)
 	Delete(id string) (string, error)
@@ -26,11 +33,13 @@ type Service struct {
 	Authorization
 	ExpenseItem
 	ExpenseList
+	CategoryList
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		ExpenseList:   NewExpenseListService(repos.ExpenseList),
 		Authorization: NewAuthService(repos.Authorization),
+		CategoryList: NewCategoryListService(repos.CategoryList),
 	}
 }
