@@ -34,6 +34,15 @@ func (h Handler) InitRoutes() *gin.Engine {
 			expenses.DELETE("/:id", h.deleteExpenseById)
 			expenses.PUT("/:id", h.updateExpenseById)
 		}
+
+		category := api.Group("/category")
+		{
+			category.POST("/", h.createCategory)
+			category.GET("/", h.getAllCategory)
+			category.DELETE("/:id", h.deleteCategory)
+			// category.DELETE("/:id", h.deleteExpenseById)
+			// category.PUT("/:id", h.updateExpenseById)
+		}
 	}
 
 	return router

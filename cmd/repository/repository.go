@@ -21,15 +21,25 @@ type ExpenseList interface {
 	Update(id int, expense todo.Expense) (todo.Expense, error)
 }
 
+type CategoryList interface {
+	CreateOne(userId int, category todo.ExpenseCategory) (int, error)
+	GetByName(userId int, name string) (int, error)
+	IsExists(userId int, name string) (bool, error)
+	GetAllByUserId(userId int) ([]todo.ExpenseCategory, error)
+	DeleteCategory(userId int, categoryId int) (int, error)
+}
+
 type Repository struct {
 	Authorization
 	ExpenseItem
 	ExpenseList
+	CategoryList
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		ExpenseList:   NewExpenseListPostgres(db),
 		Authorization: NewAuthRepository(db),
+		CategoryList: NewCategoryListPostgres(db),
 	}
 }
