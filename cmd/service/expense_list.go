@@ -25,7 +25,7 @@ func (s *ExpenseListService) GetById(id int) (todo.Expense, error) {
 	return s.repo.GetById(id)
 }
 
-func (s *ExpenseListService) GetAllByUserId(id int) ([]todo.Expense, error) {
+func (s *ExpenseListService) GetAllByUserId(id int) ([]todo.UserExpense, error) {
 	return s.repo.GetAllByUserId(id)
 }
 
