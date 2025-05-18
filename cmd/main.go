@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"fmt"
 
 	"github.com/LineCoran/go-api/cmd/handler"
@@ -10,7 +8,6 @@ import (
 	"github.com/LineCoran/go-api/cmd/service"
 	todo "github.com/LineCoran/go-api/pkg"
 	_ "github.com/lib/pq"
-	"github.com/lpernett/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -22,16 +19,16 @@ func main() {
 		logrus.Fatalln("Ошибка чтения файла конфигурации", err.Error())
 	}
 
-	if err := initEnv(); err != nil {
-		logrus.Fatalln("Ошибка загрузки .env файла", err.Error())
-	}
+	// if err := initEnv(); err != nil {
+	// 	logrus.Fatalln("Ошибка загрузки .env файла", err.Error())
+	// }
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Username: viper.GetString("db_username"),
 		DBName:   viper.GetString("db_name"),
 		Host:     viper.GetString("db_host"),
 		Port:     viper.GetString("db_port"),
-		Password: os.Getenv("DB_PASSWORD"),
+		Password: "3832",
 		SSLMode:  viper.GetString("db_sslmode"),
 	})
 	if err != nil {
@@ -58,6 +55,6 @@ func initConfig() error {
 	return viper.ReadInConfig()
 }
 
-func initEnv() error {
-	return godotenv.Load()
-}
+// func initEnv() error {
+// 	return godotenv.Load()
+// }
