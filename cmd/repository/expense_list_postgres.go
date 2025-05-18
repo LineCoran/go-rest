@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"strings"
 
 	todo "github.com/LineCoran/go-api"
 	"github.com/jmoiron/sqlx"
@@ -16,14 +17,33 @@ func NewExpenseListPostgres(db *sqlx.DB) *ExpenseListPostgres {
 }
 
 func (r *ExpenseListPostgres) Create(userId int, expense todo.Expense) (int, error) {
-	var id int
-	createExpenseQuery := fmt.Sprintf("INSERT INTO %s (user_id, category_id, amount, description) values ($1, $2, $3, $4) RETURNING id", expenseTable)
-	row := r.db.QueryRow(createExpenseQuery, userId, expense.CategoryId, expense.Amount, expense.Description)
-	if err := row.Scan(&id); err != nil {
-		fmt.Printf("Error scanning id: %v\n", err)
-		return 0, err
-	}
-	return id, nil
+    var id int
+    
+    fields := []string{"user_id", "category_id", "amount", "description"}
+    values := []interface{}{userId, expense.CategoryId, expense.Amount, expense.Description}
+    
+    if !expense.CreatedAt.IsZero() {
+        fields = append(fields, "created_at")
+        values = append(values, expense.CreatedAt)
+    }
+    placeholders := make([]string, len(values))
+    for i := range values {
+        placeholders[i] = fmt.Sprintf("$%d", i+1)
+    }
+    
+    query := fmt.Sprintf(
+        "INSERT INTO %s (%s) VALUES (%s) RETURNING id",
+        expenseTable,
+        strings.Join(fields, ", "),
+        strings.Join(placeholders, ", "),
+    )
+    
+    row := r.db.QueryRow(query, values...)
+    if err := row.Scan(&id); err != nil {
+        return 0, fmt.Errorf("error creating expense: %w", err)
+    }
+    
+    return id, nil
 }
 
 func (r *ExpenseListPostgres) Delete(id string) (string, error) {
@@ -56,16 +76,16 @@ func (r *ExpenseListPostgres) GetById(id int) (todo.Expense, error) {
 	return expense, nil
 }
 
-func (r *ExpenseListPostgres) GetAllByUserId(userId int) ([]todo.Expense, error) {
-	var expenses []todo.Expense
-	query := fmt.Sprintf("SELECT id, category_id, amount, created_at, description FROM %s WHERE user_id = $1", expenseTable)
+func (r *ExpenseListPostgres) GetAllByUserId(userId int) ([]todo.UserExpense, error) {
+	var expenses []todo.UserExpense
+	query := fmt.Sprintf("SELECT e.id, e.amount, c.name, e.created_at FROM %s e RIGHT JOIN %s c ON e.category_id = c.id WHERE e.user_id = $1", expenseTable, categoryTable)
 	err := r.db.Select(&expenses, query, userId)
 	if err != nil {
-		return []todo.Expense{}, fmt.Errorf("failed to get expense by id: %w", err)
+		return []todo.UserExpense{}, fmt.Errorf("failed to get expense by id: %w", err)
 	}
 
 	if len(expenses) == 0 {
-		return []todo.Expense{}, nil
+		return []todo.UserExpense{}, nil
 	}
 
 	return expenses, nil

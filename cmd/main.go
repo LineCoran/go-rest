@@ -19,9 +19,11 @@ func main() {
 		logrus.Fatalln("Ошибка чтения файла конфигурации", err.Error())
 	}
 
+	// :TODO Разобраться, не работает в докере
 	// if err := initEnv(); err != nil {
 	// 	logrus.Fatalln("Ошибка загрузки .env файла", err.Error())
 	// }
+
 
 	db, err := repository.NewPostgresDB(repository.Config{
 		Username: viper.GetString("db_username"),
